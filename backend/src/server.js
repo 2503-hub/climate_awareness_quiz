@@ -18,7 +18,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin:"https://climate-awareness-quiz-frontend.onrender.com",
     credentials: true,
   })
 );
@@ -46,8 +46,8 @@ connectDB()
   .then(() => {
     console.log("MongoDB connected");
 
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running on ${PORT}`);
     });
   })
   .catch((err) => {
