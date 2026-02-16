@@ -1,4 +1,3 @@
-/* Outer wrapper to center the card on the page */
 .auth-container {
     display: flex;
     justify-content: center;
@@ -8,8 +7,6 @@
     margin: 0;
     font-family: 'Poppins', sans-serif;
 }
-
-/* The Main Card */
 .auth-card {
     background-color: #fff;
     border-radius: 30px;
@@ -20,15 +17,12 @@
     max-width: 95vw;
     min-height: 550px;
 }
-
-/* Base Form Container Styles */
 .form-container {
     position: absolute;
     top: 0;
     height: 100%;
     transition: all 0.6s ease-in-out;
 }
-
 .form-container form {
     background-color: #fff;
     display: flex;
@@ -77,19 +71,17 @@
     width: 100%;
     margin: 8px 0;
 }
-
 .input-group input {
     background-color: #eee;
     border: none;
     margin: 8px 0;
     padding: 12px 15px;
-    padding-right: 45px; /* Space for the icon */
+    padding-right: 45px; 
     font-size: 14px;
     border-radius: 8px;
     width: 100%;
     outline: none;
 }
-
 .input-group .icon {
     position: absolute;
     right: 15px;
@@ -97,33 +89,6 @@
     transform: translateY(-50%);
     color: #333;
 }
-
-/* --- Social Icons --- */
-.social-container {
-    margin: 20px 0;
-    display: flex;
-    gap: 10px;
-}
-
-.social-icon {
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 5px;
-    height: 40px;
-    width: 40px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.social-icon:hover {
-    background-color: #638cf5;
-    color: #fff;
-    border-color: #638cf5;
-}
-
 /* --- The Sliding Blue Toggle --- */
 .toggle-container {
     position: absolute;
@@ -133,7 +98,7 @@
     height: 100%;
     overflow: hidden;
     transition: all 0.6s ease-in-out;
-    border-radius: 150px 0 0 100px; /* The curve from the video */
+    border-radius: 150px 0 0 100px;
     z-index: 1000;
 }
 
@@ -171,6 +136,14 @@
     top: 0;
     transition: all 0.6s ease-in-out;
 }
+.toggle-panel h2 {
+    margin-bottom: 15px; 
+}
+.toggle-panel p {
+    margin-bottom: 25px; 
+    font-size: 14px;
+    line-height: 1.4;
+}
 
 .toggle-left { transform: translateX(-200%); }
 .auth-card.active .toggle-left { transform: translateX(0); }
@@ -205,27 +178,18 @@
         width: 100%;
         border-radius: 0;
         display: flex;
-        flex-direction: column;
+        flex-direction: column; 
+        overflow-y: auto; 
     }
-
-    .form-container {
-        position: relative;
-        width: 100% !important;
-        height: 60% !important;
-        left: 0 !important;
-        transform: none !important;
-    }
-
     .toggle-container {
-        position: relative;
+        position: relative; 
         width: 100% !important;
-        height: 40% !important;
+        height: 35vh !important;
         left: 0 !important;
         transform: none !important;
         border-radius: 0 0 50px 50px;
-        order: -1; /* Puts blue panel on top for mobile */
+        order: -1;
     }
-
     .toggle {
         width: 100%;
         left: 0;
@@ -235,16 +199,49 @@
     .toggle-panel {
         width: 100%;
         transform: none !important;
+        position: absolute;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s;
     }
 
-    .auth-card.active .sign-up, 
+    /* If isLogin is true (sign-in), show the "Register" prompt panel */
+    .auth-card:not(.active) .toggle-right {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* If isLogin is false (sign-up/active), show the "Login" prompt panel */
+    .auth-card.active .toggle-left {
+        opacity: 1;
+        visibility: visible;
+    }
+    .form-container {
+        position: relative; 
+        width: 100% !important;
+        height: auto !important;
+        padding: 40px 20px;
+        transform: none !important;
+    }
+
+    /* Logic to Hide/Show forms on mobile */
+    .sign-in, .sign-up {
+        display: none; 
+    }
+
+    /* Show Sign In when NOT active */
     .auth-card:not(.active) .sign-in {
         display: flex;
         opacity: 1;
     }
 
-    .auth-card.active .sign-in,
-    .auth-card:not(.active) .sign-up {
-        display: none;
+    /* Show Sign Up when active */
+    .auth-card.active .sign-up {
+        display: flex;
+        opacity: 1;
+    }
+
+    .auth-form {
+        padding: 20px;
     }
 }

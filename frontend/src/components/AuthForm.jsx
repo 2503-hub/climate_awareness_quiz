@@ -80,13 +80,13 @@ const AuthForm = () => {
               <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
               <Lock className="icon" size={20} />
             </div>
-            <button type="submit" className="btn-primary">Login</button>
-            <div className="social-container">
+            <button type="submit" className="btn-primary">Sign In</button>
+            {/* <div className="social-container">
               <div className="social-icon"><Chrome size={20}/></div>
               <div className="social-icon"><Facebook size={20}/></div>
               <div className="social-icon"><Github size={20}/></div>
               <div className="social-icon"><Linkedin size={20}/></div>
-            </div>
+            </div> */}
           </form>
         </div>
 
