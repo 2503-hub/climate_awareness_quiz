@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Chrome, Facebook, Github, Linkedin, Mail, Home } from 'lucide-react';
+import { User, Lock, Mail, Home } from 'lucide-react';
 import { useAuth } from "../context/AuthContext";
 import '../styles/AuthForm.css';
 
@@ -22,7 +22,8 @@ const AuthForm = () => {
     e.preventDefault();
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
-      const res = await fetch(`http://localhost:4000${endpoint}`, {
+      const API_BASE_URL = "https://climate-awareness-quiz-backend.onrender.com";
+      const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
