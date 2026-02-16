@@ -5,7 +5,7 @@ import { ArrowLeft, Leaf } from "lucide-react";
 import greenhouseImg from "../assets/greenhouse.png";
 import deforestationImg from "../assets/deforestation.jpg";
 import renewableImg from "../assets/renewable.png";
-import seaLevelImg from "../assets/sealevel.jpg";
+import seaLevelImg from "../assets/seaLevel.jpg";
 import globalImg from "../assets/global.png";
 
 const articlesData = [
