@@ -43,7 +43,7 @@ export const generateReport = async (req, res) => {
       questionCount: q.questions.length,
       score: q.score,
       date: q.createdAt.toISOString(),
-      category: q.category,
+      category: q.category || "General Awareness",
     }));
 
     res.json(reportData);
