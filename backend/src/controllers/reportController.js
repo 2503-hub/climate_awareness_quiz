@@ -8,17 +8,33 @@ export const generateReport = async (req, res) => {
     const filter = {};
     if (startDate || endDate) {
       filter.createdAt = {};
-      if (startDate) filter.createdAt.$gte = new Date(startDate);
-      if (endDate) filter.createdAt.$lte = new Date(endDate);
+      if (startDate) {
+        const start = new Date(startDate);
+        if (Number.isNaN(start.getTime())) {
+          return res.status(400).json({ message: "Invalid startDate" });
+        }
+        filter.createdAt.$gte = start;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        if (Number.isNaN(end.getTime())) {
+          return res.status(400).json({ message: "Invalid endDate" });
+        }
+        end.setHours(23, 59, 59, 999); // include full end day
+        filter.createdAt.$lte = end;
+      }
     }
-    if (category) filter.category = category;
+    if (category?.trim()) {
+      filter.category = { $regex: `^${category.trim()}$`, $options: "i" };
+    }
 
     const quizzes = await Quiz.find(filter)
       .populate("user", "name email")
       .sort({ createdAt: -1 });
 
-    if (!quizzes || quizzes.length === 0)
-      return res.status(404).json({ message: "No data available." });
+    if (!quizzes || quizzes.length === 0) {
+      return res.status(200).json([]);
+    }
 
     // Optionally: Format for report
     const reportData = quizzes.map((q) => ({
