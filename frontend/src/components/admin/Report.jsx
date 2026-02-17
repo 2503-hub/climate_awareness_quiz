@@ -1,7 +1,7 @@
-import {  useState } from "react";
+import { useState } from "react";
 import { saveAs } from "file-saver";
 import { fetchReports } from "../api/reportApi";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download, RefreshCw } from "lucide-react"; // Added modern icons
 import { useNavigate } from "react-router-dom";
 
 export default function Reports() {
@@ -10,6 +10,16 @@ export default function Reports() {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  
+  // Define your available quiz categories here
+  const categories = [
+    "Climate Science",
+    "Renewable Energy",
+    "Biodiversity",
+    "Policy & Mitigation",
+    "General"
+  ];
+
   const [params, setParams] = useState({
     startDate: "",
     endDate: "",
@@ -32,7 +42,7 @@ export default function Reports() {
       console.error(err);
       setReports([]);
       setHasSearched(true);
-      setErrorMessage("Could not fetch reports. Please try again.");
+      setErrorMessage("Could not fetch reports. Ensure you are logged in as an Admin.");
     } finally {
       setLoading(false);
     }
@@ -46,7 +56,7 @@ export default function Reports() {
       .join("\n");
     const csv = `${headers}\n${rows}`;
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    saveAs(blob, "report.csv");
+    saveAs(blob, "climate_report.csv");
   };
 
   return (
@@ -55,45 +65,66 @@ export default function Reports() {
         <ArrowLeft size={20} /> Dashboard
       </button>
 
-      <h2>Generate Reports</h2>
+      <h2>Climate Quiz Analytics</h2>
 
       <div className="report-filters">
-        <input
-          type="date"
-          name="startDate"
-          value={params.startDate}
-          onChange={handleInputChange}
-        />
-        <input
-          type="date"
-          name="endDate"
-          value={params.endDate}
-          onChange={handleInputChange}
-        />
-        <input
-          type="text"
-          placeholder="Category"
-          name="category"
-          value={params.category}
-          onChange={handleInputChange}
-        />
-        <button className="primary-btn" onClick={handleFetchReports}>
-          Fetch Reports
+        <div className="input-wrapper">
+          <label>From</label>
+          <input
+            type="date"
+            name="startDate"
+            value={params.startDate}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="input-wrapper">
+          <label>To</label>
+          <input
+            type="date"
+            name="endDate"
+            value={params.endDate}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="input-wrapper">
+          <label>Topic Category</label>
+          <select
+            name="category"
+            value={params.category}
+            onChange={handleInputChange}
+            className="category-select"
+          >
+            <option value="">All Categories</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button className="primary-btn" onClick={handleFetchReports} disabled={loading}>
+          {loading ? <RefreshCw className="spinner" size={18} /> : "Fetch Reports"}
         </button>
+
         {reports.length > 0 && (
           <button className="secondary-btn" onClick={handleDownloadCSV}>
-            Download CSV
+            <Download size={18} /> Download CSV
           </button>
         )}
       </div>
 
-      {loading && <p className="loading">Loading reports…</p>}
+      {loading && <p className="loading">Searching database...</p>}
 
       {!loading && errorMessage && <p className="error-msg">{errorMessage}</p>}
+      
       {!loading && hasSearched && !errorMessage && reports.length === 0 && (
-        <p className="empty-msg">
-          No reports found for these filters. Try leaving category blank or using "general".
-        </p>
+        <div className="empty-msg-box">
+          <p>No results found for these filters.</p>
+          <span>Try expanding your date range or selecting "All Categories".</span>
+        </div>
       )}
 
       <div className="report-table">
@@ -112,12 +143,12 @@ export default function Reports() {
             <tbody>
               {reports.map((r, idx) => (
                 <tr key={idx}>
-                  <td>{r.user}</td>
+                  <td><strong>{r.user}</strong></td>
                   <td>{r.email}</td>
                   <td>{r.questionCount}</td>
-                  <td>{r.score}</td>
+                  <td className={r.score > 70 ? "high-score" : ""}>{r.score}%</td>
                   <td>{new Date(r.date).toLocaleDateString()}</td>
-                  <td>{r.category}</td>
+                  <td><span className="badge">{r.category}</span></td>
                 </tr>
               ))}
             </tbody>
@@ -125,150 +156,50 @@ export default function Reports() {
         )}
       </div>
 
-      {/* Embedded CSS */}
       <style>{`
-        .reports-container {
-          padding: 2rem;
-          min-height: 100vh;
-          background: linear-gradient(to bottom right, #e6f4ff, #f5fbff);
-          font-family: 'Segoe UI', sans-serif;
+        .reports-container { padding: 2.5rem; min-height: 100vh; background: #f0f7ff; font-family: 'Inter', sans-serif; }
+        h2 { margin-bottom: 2rem; color: #1e3a8a; font-weight: 700; }
+        .back-btn { display: flex; align-items: center; gap: 6px; background: none; border: none; color: #2563eb; font-weight: 600; cursor: pointer; margin-bottom: 1.5rem; }
+        
+        .report-filters { 
+          display: flex; 
+          flex-wrap: wrap; 
+          gap: 1.5rem; 
+          margin-bottom: 2rem; 
+          background: white; 
+          padding: 1.5rem; 
+          border-radius: 12px; 
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+          align-items: flex-end;
         }
 
-        h2 {
-          margin-bottom: 1.5rem;
-          color: #1e3a8a;
+        .input-wrapper { display: flex; flex-direction: column; gap: 0.5rem; }
+        .input-wrapper label { font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+
+        .report-filters input, .category-select { 
+          padding: 0.6rem 1rem; 
+          border-radius: 8px; 
+          border: 1px solid #cbd5e1; 
+          background: #f8fafc;
+          min-width: 200px;
         }
 
-        .back-btn {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: transparent;
-          border: none;
-          color: #2563eb;
-          font-weight: 600;
-          cursor: pointer;
-          margin-bottom: 1rem;
-        }
+        .primary-btn { background: #2563eb; color: white; padding: 0.7rem 1.5rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .secondary-btn { background: #10b981; color: white; padding: 0.7rem 1.5rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        
+        .report-table { background: white; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: #f1f5f9; color: #475569; padding: 1rem; text-align: left; font-size: 0.85rem; }
+        td { padding: 1rem; border-top: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .high-score { color: #059669; font-weight: 700; }
+        .badge { background: #dbeafe; color: #1e40af; padding: 0.2rem 0.6rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
+        
+        .empty-msg-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 2rem; border-radius: 12px; text-align: center; }
+        .empty-msg-box p { color: #92400e; font-weight: 700; margin: 0; }
+        .empty-msg-box span { color: #b45309; font-size: 0.9rem; }
 
-        .back-btn:hover {
-          color: #1d4ed8;
-        }
-
-        .report-filters {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .report-filters input {
-          padding: 0.6rem 0.8rem;
-          border-radius: 8px;
-          border: 1px solid #93c5fd;
-          outline: none;
-          background: #ffffff;
-          transition: 0.2s ease;
-        }
-
-        .report-filters input:focus {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-        }
-
-        .primary-btn {
-          padding: 0.6rem 1rem;
-          border-radius: 8px;
-          border: none;
-          background: #2563eb;
-          color: white;
-          font-weight: 600;
-          cursor: pointer;
-          transition: 0.2s ease;
-        }
-
-        .primary-btn:hover {
-          background: #1d4ed8;
-        }
-
-        .secondary-btn {
-          padding: 0.6rem 1rem;
-          border-radius: 8px;
-          border: none;
-          background: #0ea5e9;
-          color: white;
-          font-weight: 600;
-          cursor: pointer;
-          transition: 0.2s ease;
-        }
-
-        .secondary-btn:hover {
-          background: #0284c7;
-        }
-
-        .loading {
-          color: #2563eb;
-          font-weight: 500;
-        }
-
-        .error-msg {
-          color: #b91c1c;
-          font-weight: 600;
-          margin-bottom: 1rem;
-        }
-
-        .empty-msg {
-          color: #334155;
-          font-weight: 500;
-          margin-bottom: 1rem;
-        }
-
-        .report-table {
-          overflow-x: auto;
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
-          padding: 1rem;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        th {
-          background-color: #dbeafe;
-          color: #1e3a8a;
-          padding: 0.8rem;
-          text-align: left;
-          font-size: 0.9rem;
-        }
-
-        td {
-          padding: 0.8rem;
-          border-top: 1px solid #e5e7eb;
-          font-size: 0.9rem;
-        }
-
-        tr:hover {
-          background-color: #f0f9ff;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .report-filters {
-            flex-direction: column;
-          }
-
-          .primary-btn,
-          .secondary-btn {
-            width: 100%;
-          }
-
-          th, td {
-            font-size: 0.8rem;
-          }
-        }
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
     </div>
   );
