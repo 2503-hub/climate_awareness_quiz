@@ -4,6 +4,7 @@ dotenv.config(); // Always first
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import { setupSwagger } from "./swagger.js";
 
 // Routes
 import authRoutes from "./routes/authRoutes.js";
@@ -22,10 +23,11 @@ app.use(
     credentials: true,
   })
 );
+setupSwagger(app);
 
 // ================= ROUTES =================
 app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/reports", reportRoutes);
 
