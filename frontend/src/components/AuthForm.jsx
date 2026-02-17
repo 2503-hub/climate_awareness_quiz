@@ -22,7 +22,7 @@ const AuthForm = () => {
     e.preventDefault();
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
-      const API_BASE_URL = "https://climate-awareness-quiz-backend.onrender.com/api";
+      const API_BASE_URL = "https://climate-awareness-quiz-backend.onrender.com";
       const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
