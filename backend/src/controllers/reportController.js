@@ -25,7 +25,7 @@ export const generateReport = async (req, res) => {
       }
     }
     if (category?.trim()) {
-      filter.category = { $regex: `^${category.trim()}$`, $options: "i" };
+      filter.category = { $regex: category.trim(), $options: "i" };
     }
 
     const quizzes = await Quiz.find(filter)
