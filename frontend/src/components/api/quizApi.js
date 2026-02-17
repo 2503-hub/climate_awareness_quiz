@@ -1,5 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const API_URL = `${BASE_URL}/api/questions`;
+import { axiosInstance } from "./apiClient";
 
 /**
  * Fetch all quiz questions
@@ -7,13 +6,8 @@ const API_URL = `${BASE_URL}/api/questions`;
  */
 export const fetchAllQuestions = async () => {
   try {
-    const res = await fetch(`${API_URL}/all`);
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch all questions");
-    }
-
-    return await res.json();
+    const res = await axiosInstance.get("/questions/all");
+    return res.data;
   } catch (err) {
     console.error("Error fetching all questions:", err);
     return []; // always return an array
@@ -27,13 +21,8 @@ export const fetchAllQuestions = async () => {
  */
 export const fetchQuestionById = async (id) => {
   try {
-    const res = await fetch(`${API_URL}/${id}`);
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch question by ID");
-    }
-
-    return await res.json();
+    const res = await axiosInstance.get(`/questions/${id}`);
+    return res.data;
   } catch (err) {
     console.error(`Error fetching question ${id}:`, err);
     return null;
@@ -48,19 +37,11 @@ export const fetchQuestionById = async (id) => {
  */
 export const validateAnswer = async (questionId, selectedAnswer) => {
   try {
-    const res = await fetch(`${API_URL}/validate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ questionId, selectedAnswer }),
+    const res = await axiosInstance.post("/questions/validate", {
+      questionId,
+      selectedAnswer,
     });
-
-    if (!res.ok) {
-      throw new Error("Failed to validate answer");
-    }
-
-    return await res.json(); // { correct: true | false }
+    return res.data; // { correct: true | false }
   } catch (err) {
     console.error("Error validating answer:", err);
     return { correct: false };
