@@ -1,6 +1,16 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const RAW_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://climate-awareness-quiz-backend.onrender.com";
+
+const normalizeApiBaseUrl = (url) => {
+  const trimmed = String(url).replace(/\/+$/, "");
+  return trimmed.endsWith("/api") ? trimmed : `${trimmed}/api`;
+};
+
+const BASE_URL = normalizeApiBaseUrl(RAW_BASE_URL);
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
