@@ -8,6 +8,8 @@ export default function Reports() {
   const navigate = useNavigate();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [params, setParams] = useState({
     startDate: "",
     endDate: "",
@@ -21,12 +23,16 @@ export default function Reports() {
 
   const handleFetchReports = async () => {
     setLoading(true);
+    setErrorMessage("");
     try {
       const data = await fetchReports(params);
       setReports(data);
+      setHasSearched(true);
     } catch (err) {
       console.error(err);
-      alert("No data available for the selected criteria.");
+      setReports([]);
+      setHasSearched(true);
+      setErrorMessage("Could not fetch reports. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -82,6 +88,13 @@ export default function Reports() {
       </div>
 
       {loading && <p className="loading">Loading reports…</p>}
+
+      {!loading && errorMessage && <p className="error-msg">{errorMessage}</p>}
+      {!loading && hasSearched && !errorMessage && reports.length === 0 && (
+        <p className="empty-msg">
+          No reports found for these filters. Try leaving category blank or using "general".
+        </p>
+      )}
 
       <div className="report-table">
         {reports.length > 0 && (
@@ -196,6 +209,18 @@ export default function Reports() {
         .loading {
           color: #2563eb;
           font-weight: 500;
+        }
+
+        .error-msg {
+          color: #b91c1c;
+          font-weight: 600;
+          margin-bottom: 1rem;
+        }
+
+        .empty-msg {
+          color: #334155;
+          font-weight: 500;
+          margin-bottom: 1rem;
         }
 
         .report-table {

@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const res = await axiosInstance.get("/user/profile"); // protected route
+        const res = await axiosInstance.get("/users/profile"); // protected route
         setUser(res.data);
       } catch (err) {
         console.log("Failed to fetch profile:", err.message);
