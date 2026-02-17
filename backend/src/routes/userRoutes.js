@@ -21,7 +21,7 @@ const router = express.Router();
 // Current user profile
 /**
  * @swagger
- * /user/profile:
+ * /users/profile:
  *   get:
  *     summary: Get current user's profile
  *     tags: [Users]
@@ -37,7 +37,7 @@ router.get("/profile", protect, getProfile);
 //  update own profile
 /**
  * @swagger
- * /user/profile:
+ * /users/profile:
  *   put:
  *     summary: Update current user's profile
  *     tags: [Users]
